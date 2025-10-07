@@ -5,6 +5,7 @@ from textnode_to_htmlnode import text_node_to_html_node
 from split_nodes_delimiter import split_nodes_delimiter
 from extract_markdown import extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
 from markdown_to_blocks import markdown_to_blocks
+from block_types import BlockType, block_to_block_type
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -313,6 +314,43 @@ Paragraph three
         md = ""
         blocks = markdown_to_blocks(md)
         self.assertEqual(blocks, [])
+
+class TestBlockToBlockType(unittest.TestCase):
+    def test_heading(self):
+        block = "# Heading"
+        self.assertEqual(block_to_block_type(block), BlockType.HEADING)
+    
+    def test_code(self):
+        block = "```\ncode here\n```"
+        self.assertEqual(block_to_block_type(block), BlockType.CODE)
+    
+    def test_quote(self):
+        block = "> Quote line 1\n> Quote line 2"
+        self.assertEqual(block_to_block_type(block), BlockType.QUOTE)
+    
+    def test_unordered_list(self):
+        block = "- Item 1\n- Item 2"
+        self.assertEqual(block_to_block_type(block), BlockType.UNORDERED_LIST)
+    
+    def test_ordered_list(self):
+        block = "1. Item 1\n2. Item 2"
+        self.assertEqual(block_to_block_type(block), BlockType.ORDERED_LIST)
+    
+    def test_paragraph(self):
+        block = "Just a paragraph"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+    
+    def test_empty_block(self):
+        block = ""
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+    
+    def test_multi_level_heading(self):
+        block = "#### Level 4 Heading"
+        self.assertEqual(block_to_block_type(block), BlockType.HEADING)
+    
+    def test_ordered_list_invalid(self):
+        block = "2. Item 1\n3. Item 2"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
 
 if __name__ == "__main__":
     unittest.main()
