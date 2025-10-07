@@ -14,13 +14,13 @@ def block_to_block_type(block):
     
     lines = block.split("\n")
     
-    # Heading: starts with 1-6 # followed by space
-    if block.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
-        return BlockType.HEADING
-    
     # Code: starts with ``` and ends with ```
     if block.startswith("```") and block.endswith("```"):
         return BlockType.CODE
+
+    # Heading: starts with 1-6 # followed by space
+    if block.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
+        return BlockType.HEADING
     
     # Quote: every line starts with >
     if all(line.startswith(">") for line in lines if line):
