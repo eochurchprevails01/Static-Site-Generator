@@ -4,6 +4,7 @@ from htmlnode import HTMLNode, LeafNode, ParentNode
 from textnode_to_htmlnode import text_node_to_html_node
 from split_nodes_delimiter import split_nodes_delimiter
 from extract_markdown import extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
+from markdown_to_blocks import markdown_to_blocks
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -28,7 +29,7 @@ class TestTextNode(unittest.TestCase):
 
 class TestLeafNode(unittest.TestCase):
     def test_leaf_to_html_p(self):
-        node = LeafNode("p","Hello, world!")
+        node = LeafNode("p", "Hello, world!")
         self.assertEqual(node.to_html(), "<p>Hello, world!</p>")
 
     def test_leaf_to_html_a_with_props(self):
@@ -265,6 +266,53 @@ class TestSplitNodesImageLink(unittest.TestCase):
         text = ""
         nodes = text_to_textnodes(text)
         self.assertListEqual([], nodes)
+
+class TestMarkdownToBlocks(unittest.TestCase):
+    def test_markdown_to_blocks(self):
+        md = """
+This is **bolded** paragraph
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "This is **bolded** paragraph",
+                "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                "- This is a list\n- with items",
+            ],
+        )
+
+    def test_single_block(self):
+        md = "Single block of text"
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(blocks, ["Single block of text"])
+
+    def test_multiple_newlines(self):
+        md = """
+Paragraph one
+
+
+Paragraph two
+
+
+Paragraph three
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            ["Paragraph one", "Paragraph two", "Paragraph three"],
+        )
+
+    def test_empty_input(self):
+        md = ""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(blocks, [])
 
 if __name__ == "__main__":
     unittest.main()
