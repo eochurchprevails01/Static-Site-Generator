@@ -1,6 +1,6 @@
 # Static Site Generator
 
-A Python-based static site generator that converts Markdown files to HTML. This project was built as part of the boot.dev curriculum, implementing a complete markdown parsing and HTML generation system.
+A Python-based static site generator that converts Markdown files to HTML pages with templates. This project was built as part of the boot.dev curriculum, implementing a complete markdown parsing, HTML generation, and site building system.
 
 ## Features
 
@@ -13,16 +13,23 @@ A Python-based static site generator that converts Markdown files to HTML. This 
   - Lists (ordered and unordered)
   - Blockquotes
 
-- **Static Asset Copying**: Recursive copying of static assets (CSS, images, etc.) to the public directory
+- **Page Generation**: Generate complete HTML pages from markdown content using templates
+  - Extract titles from H1 headers
+  - Apply HTML templates with placeholders
+  - Generate full websites with navigation and styling
 
-- **Comprehensive Testing**: 53 unit tests covering all functionality
+- **Static Asset Management**: Recursive copying of static assets (CSS, images, etc.) to the public directory
+
+- **Web Server**: Built-in development server for previewing generated sites
+
+- **Comprehensive Testing**: 57 unit tests covering all functionality
 
 ## Project Structure
 
 ```
 Static-Site-Generator/
 ├── src/
-│   ├── main.py                 # Main entry point with copy functionality
+│   ├── main.py                 # Main entry point with site generation
 │   ├── textnode.py            # TextNode class and TextType enum
 │   ├── htmlnode.py            # HTMLNode classes (HTMLNode, LeafNode, ParentNode)
 │   ├── textnode_to_htmlnode.py # TextNode to HTMLNode conversion
@@ -30,14 +37,16 @@ Static-Site-Generator/
 │   ├── split_nodes_delimiter.py # TextNode splitting by delimiters
 │   ├── markdown_to_blocks.py  # Markdown to block conversion
 │   ├── block_types.py         # Block type detection
-│   ├── markdown_to_html.py    # Main markdown to HTML conversion
-│   └── test_textnode.py       # Comprehensive unit tests
+│   ├── markdown_to_html.py    # Main markdown to HTML conversion and title extraction
+├── content/
+│   └── index.md               # Main page content in markdown
 ├── static/
 │   ├── index.css              # CSS styling for generated sites
 │   └── images/
 │       └── tolkien.png        # Sample image
 ├── public/                    # Generated site output (gitignored)
-├── main.sh                    # Run script
+├── template.html              # HTML template for page generation
+├── main.sh                    # Run script with web server
 ├── test.sh                    # Test runner
 ├── .gitignore                 # Git ignore rules
 └── README.md                  # This file
@@ -57,15 +66,16 @@ cd Static-Site-Generator
 
 ### Running the Generator
 
-Execute the main script to copy static assets:
+Execute the main script to generate the complete site and start the development server:
 
 ```bash
 ./main.sh
 ```
 
 This will:
-- Copy all files from `static/` to `public/`
-- Generate the site structure
+- Generate HTML pages from markdown content using templates
+- Copy all static assets (CSS, images, etc.) to the public directory
+- Start a local web server at http://localhost:8888
 
 ### Running Tests
 
@@ -75,12 +85,13 @@ Run the comprehensive test suite:
 ./test.sh
 ```
 
-All 53 tests should pass, covering:
+All 57 tests should pass, covering:
 - TextNode operations
 - HTMLNode generation
 - Markdown parsing
 - Block type detection
-- Full markdown to HTML conversion
+- Title extraction
+- Full page generation
 
 ## Key Components
 
@@ -99,11 +110,21 @@ All 53 tests should pass, covering:
 2. Determine block types (paragraph, heading, code, quote, list)
 3. Convert blocks to HTML nodes
 4. Handle inline markdown within blocks
+5. Extract titles from H1 headers
+
+### Page Generation
+- `generate_page()`: Converts markdown to HTML pages using templates
+- Template system with `{{ Title }}` and `{{ Content }}` placeholders
+- Automatic directory creation for output files
 
 ### Static Asset Handling
 - Recursive directory copying
 - Clean destination directory before copying
 - Logging of copied files
+
+### Development Server
+- Built-in Python HTTP server for local development
+- Serves generated site at http://localhost:8888
 
 ## Development
 
