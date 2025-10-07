@@ -6,7 +6,7 @@ from split_nodes_delimiter import split_nodes_delimiter
 from extract_markdown import extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
 from markdown_to_blocks import markdown_to_blocks
 from block_types import BlockType, block_to_block_type
-from markdown_to_html import markdown_to_html_node
+from markdown_to_html import markdown_to_html_node, extract_title
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -382,6 +382,23 @@ the **same** even with inline stuff
             html,
             "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
         )
+
+    def test_extract_title(self):
+        md = "# Hello"
+        self.assertEqual(extract_title(md), "Hello")
+
+    def test_extract_title_with_whitespace(self):
+        md = "#   Hello World   "
+        self.assertEqual(extract_title(md), "Hello World")
+
+    def test_extract_title_no_header(self):
+        md = "No header here"
+        with self.assertRaises(ValueError):
+            extract_title(md)
+
+    def test_extract_title_multiple_headers(self):
+        md = "# First Header\n## Second Header"
+        self.assertEqual(extract_title(md), "First Header")
 
 if __name__ == "__main__":
     unittest.main()
