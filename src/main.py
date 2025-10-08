@@ -49,6 +49,30 @@ def generate_page(from_path, template_path, dest_path):
     with open(dest_path, 'w') as f:
         f.write(full_html)
 
+def generate_pages_recursive(content_dir, template_path, dest_dir):
+    """
+    Recursively generate HTML pages from all index.md files in content_dir
+    """
+    for root, dirs, files in os.walk(content_dir):
+        for file in files:
+            if file == 'index.md':
+                # Get relative path from content_dir
+                rel_path = os.path.relpath(root, content_dir)
+                if rel_path == '.':
+                    rel_path = ''
+                
+                # Source markdown path
+                md_path = os.path.join(root, file)
+                
+                # Destination HTML path
+                if rel_path:
+                    html_path = os.path.join(dest_dir, rel_path, 'index.html')
+                else:
+                    html_path = os.path.join(dest_dir, 'index.html')
+                
+                # Generate the page
+                generate_page(md_path, template_path, html_path)
+
 def main():
     # Delete public directory
     if os.path.exists("public"):
@@ -57,8 +81,8 @@ def main():
     # Copy static files
     copy_dir("static", "public")
     
-    # Generate page
-    generate_page("content/index.md", "template.html", "public/index.html")
+    # Generate all pages
+    generate_pages_recursive("content", "template.html", "public")
 
 if __name__ == "__main__":
     main()
