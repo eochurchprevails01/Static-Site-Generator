@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 from textnode import TextNode, TextType
 from markdown_to_html import markdown_to_html_node, extract_title
 
@@ -21,7 +22,7 @@ def copy_dir(src, dst):
         elif os.path.isdir(src_path):
             copy_dir(src_path, dst_path)
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath="/"):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     
     # Read markdown
@@ -42,6 +43,10 @@ def generate_page(from_path, template_path, dest_path):
     # Replace placeholders
     full_html = template_content.replace("{{ Title }}", title).replace("{{ Content }}", html_content)
     
+    # Replace basepath in href and src
+    full_html = full_html.replace('href="/', f'href="{basepath}')
+    full_html = full_html.replace('src="/', f'src="{basepath}')
+    
     # Ensure destination directory exists
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
     
@@ -49,7 +54,7 @@ def generate_page(from_path, template_path, dest_path):
     with open(dest_path, 'w') as f:
         f.write(full_html)
 
-def generate_pages_recursive(content_dir, template_path, dest_dir):
+def generate_pages_recursive(content_dir, template_path, dest_dir, basepath="/"):
     """
     Recursively generate HTML pages from all index.md files in content_dir
     """
@@ -71,18 +76,25 @@ def generate_pages_recursive(content_dir, template_path, dest_dir):
                     html_path = os.path.join(dest_dir, 'index.html')
                 
                 # Generate the page
-                generate_page(md_path, template_path, html_path)
+                generate_page(md_path, template_path, html_path, basepath)
 
 def main():
-    # Delete public directory
-    if os.path.exists("public"):
-        shutil.rmtree("public")
+    # Get basepath from command line argument
+    basepath = "/"
+    if len(sys.argv) > 1:
+        basepath = sys.argv[1]
+    
+    dest_dir = "docs"  # Build into docs for GitHub Pages
+    
+    # Delete docs directory
+    if os.path.exists(dest_dir):
+        shutil.rmtree(dest_dir)
     
     # Copy static files
-    copy_dir("static", "public")
+    copy_dir("static", dest_dir)
     
     # Generate all pages
-    generate_pages_recursive("content", "template.html", "public")
+    generate_pages_recursive("content", "template.html", dest_dir, basepath)
 
 if __name__ == "__main__":
     main()
